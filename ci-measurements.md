@@ -87,6 +87,22 @@ one android-emulator-runner session removes that overhead.
 
 | Run | Link | Record+interaction step | Gradle build | Shot record | Interaction | Total job |
 |---|---|---|---|---|---|---|
+| 7 | [28959113270](https://github.com/AhmetSIRIM/komposto/actions/runs/28959113270) | 10m36s | 48s | 8m15s | 23s | 12m04s |
+
+Run 7: the merge works as intended; interaction cost dropped from ~65s
+(separate step with its own boot) to 23s in the shared session. Shot
+execution came in 37s above the variant A median (8m15s vs 7m38s), within
+shared-runner noise, so the total looks flat on a single run. Run 8
+repeats the measurement.
+
+## Additional finding: flaky CountdownTimer goldens
+
+Warm runs 6 and 7 each produced pixel diffs in CountdownTimer screenshot
+tests (run 6: backgroundAlphaTest and sizeTest, run 7: backgroundAlphaTest
+again), which the workflow auto-committed. The rendered frame appears to
+depend on wall-clock timing, so goldens are nondeterministic. Separate
+upstream issue candidate: inject a fixed/controllable clock into
+CountdownTimer screenshot tests.
 
 ## Variant: ATD system image (evaluated, deferred)
 
