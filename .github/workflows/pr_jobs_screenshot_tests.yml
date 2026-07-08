@@ -101,20 +101,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: |
-            T0=$(date +%s)
-            ./gradlew assembleDebug assembleDebugAndroidTest
-            T1=$(date +%s)
-            rm -rf app/screenshots/debug/
-            ./gradlew executeScreenshotTests -Precord
-            T2=$(date +%s)
-            {
-              echo "### Record step timing"
-              echo "| phase | seconds |"
-              echo "|---|---|"
-              echo "| gradle build (both APKs) | $((T1-T0)) |"
-              echo "| shot record (install + tests + processing) | $((T2-T1)) |"
-            } >> "$GITHUB_STEP_SUMMARY"
+          script: bash ./ci-measure.sh record
 
       - name: Verify screenshots (fork)
         if: steps.skip-check.outputs.skip != 'true' && github.event.pull_request.head.repo.full_name != github.repository
@@ -144,11 +131,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: |
-            T0=$(date +%s)
-            ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.annotation=core.InteractionTest
-            T1=$(date +%s)
-            echo "| interaction tests (gradle total) | $((T1-T0)) |" >> "$GITHUB_STEP_SUMMARY"
+          script: bash ./ci-measure.sh interaction
 
       - name: Commit updated screenshots
         if: steps.skip-check.outputs.skip != 'true' && github.event.pull_request.head.repo.full_name == github.repository
