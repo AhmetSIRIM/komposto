@@ -18,20 +18,14 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - name: Generate App Token
-        id: app-token
-        uses: actions/create-github-app-token@v3
-        with:
-          app-id: ${{ secrets.CI_APP_ID }}
-          private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
-
+      # Fork measurement branch: app token replaced with default GITHUB_TOKEN
+      # because CI_APP_ID/CI_APP_PRIVATE_KEY secrets are not available on forks.
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
-          token: ${{ steps.app-token.outputs.token }}
           lfs: true
 
       - name: Check if triggered by CI screenshot commit
@@ -108,8 +102,19 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: |
+            T0=$(date +%s)
+            ./gradlew assembleDebug assembleDebugAndroidTest
+            T1=$(date +%s)
             rm -rf app/screenshots/debug/
             ./gradlew executeScreenshotTests -Precord
+            T2=$(date +%s)
+            {
+              echo "### Record step timing"
+              echo "| phase | seconds |"
+              echo "|---|---|"
+              echo "| gradle build (both APKs) | $((T1-T0)) |"
+              echo "| shot record (install + tests + processing) | $((T2-T1)) |"
+            } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Verify screenshots (fork)
         if: steps.skip-check.outputs.skip != 'true' && github.event.pull_request.head.repo.full_name != github.repository
@@ -139,7 +144,11 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.annotation=core.InteractionTest
+          script: |
+            T0=$(date +%s)
+            ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.annotation=core.InteractionTest
+            T1=$(date +%s)
+            echo "| interaction tests (gradle total) | $((T1-T0)) |" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit updated screenshots
         if: steps.skip-check.outputs.skip != 'true' && github.event.pull_request.head.repo.full_name == github.repository
