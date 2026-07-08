@@ -63,11 +63,37 @@ one to measure warm.
 | 4 (seed) | [28945575409](https://github.com/AhmetSIRIM/komposto/actions/runs/28945575409) | miss on restore, saved on post (28s) | 14m42s | 7m07s | 6m20s | 16m49s |
 | 5 (warm) | [28957197414](https://github.com/AhmetSIRIM/komposto/actions/runs/28957197414) | hit (9s restore) | 9m39s | 56s | 7m39s | 12m09s |
 
-Run 5 confirms the hypothesis: warm Gradle cache cuts the build from ~6m40s
-to 56s, Record step from ~13m46s to 9m39s, total job from ~15m54s to
-12m09s. Shot execution came in ~1m10s above baseline (7m39s vs 6m20-33s),
-plausibly shared-runner variance; run 6 repeats the warm measurement to
-check.
+| 6 (warm) | [28958105723](https://github.com/AhmetSIRIM/komposto/actions/runs/28958105723) | hit (9s restore) | 9m27s | 52s | 7m37s | 12m05s |
+
+Variant A verdict: CONFIRMED. Warm Gradle cache cuts the build from ~6m40s
+to ~54s and the total job from ~15m54s to ~12m07s (about 24 percent, ~4min
+per run). Runs 5 and 6 agree within 4 seconds.
+
+Note: Shot execution is systematically ~75s slower in warm runs (7m38s vs
+6m20-33s cold). Likely daemon-warmth composition: in cold runs the 7min
+build leaves a hot Gradle daemon and the Shot invocation is almost pure
+test execution; in warm runs the Shot invocation carries more of its own
+configuration/packaging cost. Net total still improves by ~4 minutes.
+
+With the build cached, Shot test execution (~7.5min) is now the dominant
+cost. Structural follow-ups (out of scope for this change): sharding
+across emulators, or migrating to JVM screenshot testing (Roborazzi).
+
+## Variant B: single emulator session (interaction tests merged into Record)
+
+Hypothesis: the separate interaction step pays a second emulator
+boot/setup (~20-40s of its ~65s total). Running both Gradle commands in
+one android-emulator-runner session removes that overhead.
+
+| Run | Link | Record+interaction step | Gradle build | Shot record | Interaction | Total job |
+|---|---|---|---|---|---|---|
+
+## Variant: ATD system image (evaluated, deferred)
+
+`aosp_atd` would speed AVD creation (cache-miss only) and boot, but boot
+from snapshot is already just ~20-60s AND a different system image can
+change rendered pixels, which would force regenerating all 227 LFS golden
+screenshots. Weak gain, real migration cost; not pursued.
 
 ## Variant B: (planned) single emulator boot + ATD image
 

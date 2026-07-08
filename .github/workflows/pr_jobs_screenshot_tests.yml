@@ -123,21 +123,6 @@ jobs:
           disable-animations: true
           script: ./gradlew executeScreenshotTests
 
-      - name: Run interaction tests
-        if: steps.skip-check.outputs.skip != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 32
-          arch: x86_64
-          profile: pixel_6
-          target: google_apis
-          avd-name: ubuntu-avd-x86_64-32
-          emulator-boot-timeout: 120
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: bash ./ci-measure.sh interaction
-
       - name: Commit updated screenshots
         if: steps.skip-check.outputs.skip != 'true' && github.event.pull_request.head.repo.full_name == github.repository
         run: |

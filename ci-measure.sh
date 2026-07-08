@@ -14,12 +14,15 @@ case "$phase" in
     rm -rf app/screenshots/debug/
     ./gradlew executeScreenshotTests -Precord
     T2=$(date +%s)
+    ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.annotation=core.InteractionTest
+    T3=$(date +%s)
     {
       echo "### Record step timing"
       echo "| phase | seconds |"
       echo "|---|---|"
       echo "| gradle build (both APKs) | $((T1-T0)) |"
       echo "| shot record (install + tests + processing) | $((T2-T1)) |"
+      echo "| interaction tests (same emulator session) | $((T3-T2)) |"
     } >> "$GITHUB_STEP_SUMMARY"
     ;;
   interaction)
