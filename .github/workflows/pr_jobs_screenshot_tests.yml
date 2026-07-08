@@ -68,6 +68,8 @@ jobs:
       - name: Gradle cache
         if: steps.skip-check.outputs.skip != 'true'
         uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
 
       - name: AVD cache
         if: steps.skip-check.outputs.skip != 'true'
@@ -110,6 +112,7 @@ jobs:
           script: |
             rm -rf app/screenshots/debug/
             ./gradlew executeScreenshotTests -Precord
+            ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.annotation=core.InteractionTest
 
       - name: Verify screenshots (fork)
         if: steps.skip-check.outputs.skip != 'true' && github.event.pull_request.head.repo.full_name != github.repository
@@ -124,22 +127,9 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew executeScreenshotTests
-
-      - name: Run interaction tests
-        if: steps.skip-check.outputs.skip != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 32
-          arch: x86_64
-          profile: pixel_6
-          target: google_apis
-          avd-name: ubuntu-avd-x86_64-32
-          emulator-boot-timeout: 120
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.annotation=core.InteractionTest
+          script: |
+            ./gradlew executeScreenshotTests
+            ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.annotation=core.InteractionTest
 
       - name: Commit updated screenshots
         if: steps.skip-check.outputs.skip != 'true' && github.event.pull_request.head.repo.full_name == github.repository
