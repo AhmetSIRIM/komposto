@@ -60,6 +60,7 @@ one to measure warm.
 
 | Run | Link | Gradle cache | Record step | Gradle build | Shot record | Total job |
 |---|---|---|---|---|---|---|
+| 4 (seed) | [28945575409](https://github.com/AhmetSIRIM/komposto/actions/runs/28945575409) | miss on restore, saved on post (28s) | 14m42s | 7m07s | 6m20s | 16m49s |
 
 ## Variant B: (planned) single emulator boot + ATD image
 
