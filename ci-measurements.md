@@ -88,12 +88,25 @@ one android-emulator-runner session removes that overhead.
 | Run | Link | Record+interaction step | Gradle build | Shot record | Interaction | Total job |
 |---|---|---|---|---|---|---|
 | 7 | [28959113270](https://github.com/AhmetSIRIM/komposto/actions/runs/28959113270) | 10m36s | 48s | 8m15s | 23s | 12m04s |
+| 8 | [28960006229](https://github.com/AhmetSIRIM/komposto/actions/runs/28960006229) | 10m36s | 54s | 8m06s | 24s | 12m36s |
 
-Run 7: the merge works as intended; interaction cost dropped from ~65s
-(separate step with its own boot) to 23s in the shared session. Shot
-execution came in 37s above the variant A median (8m15s vs 7m38s), within
-shared-runner noise, so the total looks flat on a single run. Run 8
-repeats the measurement.
+Variant B verdict: CONFIRMED, small. Interaction cost reliably drops from
+~65s (separate step, own emulator boot) to ~23s in the shared session, a
+~40s structural saving. Shot execution noise (7m37s-8m15s across warm
+runs) partially masks it in single-run totals.
+
+## Final summary
+
+| Variant | Total job (median) | Record step | Gradle build |
+|---|---|---|---|
+| Baseline (AVD cached) | 15m54s | 13m46s | ~6m40s cold, every run |
+| A: writable Gradle cache | 12m07s | 9m33s | ~54s |
+| A+B: plus single emulator session | 12m20s | 10m36s (incl. interaction) | ~51s |
+
+Net effect of the proposed changes: roughly 15m54s to ~12m10s, about
+3m45s (24 percent) per PR run, dominated by variant A. Remaining dominant
+cost is Shot test execution (~8min); structural follow-ups (sharding, JVM
+screenshot testing) are out of scope here.
 
 ## Additional finding: flaky CountdownTimer goldens
 
