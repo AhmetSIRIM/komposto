@@ -19,11 +19,30 @@ Methodology notes:
 | Run | Link | AVD cache | Gradle cache | Record step | Boot within record | Gradle build | Shot record | Interaction step | Total job |
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | [28942031506](https://github.com/AhmetSIRIM/komposto/actions/runs/28942031506) | miss (+1m31s create) | miss | 13m40s | ~16s | 6m39s | 6m42s | did not run | failed* |
+| 2 | [28943194194](https://github.com/AhmetSIRIM/komposto/actions/runs/28943194194) | miss (+1m36s create) | miss | 13m47s | ~20s | 6m54s | 6m33s | 1m06s (gradle 46s) | 17m22s |
 
 *Run 1 failed at the final instrumentation line (multi-line script incompatible
 with android-emulator-runner's per-line shell execution); both Gradle
 invocations completed successfully, so the Record breakdown is valid. Caches
 were cold (first run on fork), so build time is an upper bound.
+
+## Findings so far
+
+1. Emulator boot from snapshot is cheap (~16-20s inside the Record step).
+   The Record step cost is almost entirely Gradle build (~6m45s) plus Shot
+   test execution (~6m35s).
+2. The Gradle cache is never populated, on this fork and on upstream alike:
+   `gradle/actions/setup-gradle` only writes cache entries from jobs on the
+   default branch, and this workflow triggers exclusively on `pull_request`.
+   Both repos show a 0s "Post Gradle cache" step (nothing saved) and a 0-1s
+   restore (nothing to restore). Every PR run therefore compiles from
+   scratch, paying roughly 7 minutes per run. Seeding the cache from a
+   default-branch job (or setting `cache-read-only: false` for this
+   workflow) is the single biggest optimization candidate.
+3. AVD cache saved successfully after run 2 (17s post step), so run 3+
+   should skip the ~1m35s AVD creation step.
+4. Screenshot recording is deterministic on the runner image: the commit
+   step found zero pixel diffs against LFS-tracked goldens.
 
 ## Variant: (planned) ATD image + single emulator boot
 
