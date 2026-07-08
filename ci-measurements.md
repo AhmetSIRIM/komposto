@@ -20,6 +20,12 @@ Methodology notes:
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | [28942031506](https://github.com/AhmetSIRIM/komposto/actions/runs/28942031506) | miss (+1m31s create) | miss | 13m40s | ~16s | 6m39s | 6m42s | did not run | failed* |
 | 2 | [28943194194](https://github.com/AhmetSIRIM/komposto/actions/runs/28943194194) | miss (+1m36s create) | miss | 13m47s | ~20s | 6m54s | 6m33s | 1m06s (gradle 46s) | 17m22s |
+| 3 | [28944433950](https://github.com/AhmetSIRIM/komposto/actions/runs/28944433950) | hit (32s restore) | miss | 13m46s | ~58s | 6m28s | 6m20s | 1m04s (gradle 45s) | 15m54s |
+
+Baseline summary (runs 2-3, AVD-cached case = run 3): total ~16m, Record
+~13m46s of which Gradle build ~6m30-55s and Shot execution ~6m20-35s.
+Record step variance across runs is under 10 seconds; the pipeline is
+remarkably stable.
 
 *Run 1 failed at the final instrumentation line (multi-line script incompatible
 with android-emulator-runner's per-line shell execution); both Gradle
@@ -44,6 +50,17 @@ were cold (first run on fork), so build time is an upper bound.
 4. Screenshot recording is deterministic on the runner image: the commit
    step found zero pixel diffs against LFS-tracked goldens.
 
-## Variant: (planned) ATD image + single emulator boot
+## Variant A: writable Gradle cache from PR jobs (`cache-read-only: false`)
 
-Pending baseline completion.
+Hypothesis: setup-gradle never persists cache because this workflow only
+runs on `pull_request` and the action defaults to read-only off the default
+branch. Allowing PR jobs to write should cut the ~6m40s build to the
+incremental cost of the PR's actual diff. Requires two runs: one to seed,
+one to measure warm.
+
+| Run | Link | Gradle cache | Record step | Gradle build | Shot record | Total job |
+|---|---|---|---|---|---|---|
+
+## Variant B: (planned) single emulator boot + ATD image
+
+Pending variant A completion.

@@ -62,6 +62,11 @@ jobs:
       - name: Gradle cache
         if: steps.skip-check.outputs.skip != 'true'
         uses: gradle/actions/setup-gradle@v4
+        with:
+          # Variant A: setup-gradle defaults to read-only cache off the
+          # default branch, and this workflow never runs on main, so the
+          # cache was never written. Let PR jobs seed it.
+          cache-read-only: false
 
       - name: AVD cache
         if: steps.skip-check.outputs.skip != 'true'
