@@ -61,6 +61,13 @@ one to measure warm.
 | Run | Link | Gradle cache | Record step | Gradle build | Shot record | Total job |
 |---|---|---|---|---|---|---|
 | 4 (seed) | [28945575409](https://github.com/AhmetSIRIM/komposto/actions/runs/28945575409) | miss on restore, saved on post (28s) | 14m42s | 7m07s | 6m20s | 16m49s |
+| 5 (warm) | [28957197414](https://github.com/AhmetSIRIM/komposto/actions/runs/28957197414) | hit (9s restore) | 9m39s | 56s | 7m39s | 12m09s |
+
+Run 5 confirms the hypothesis: warm Gradle cache cuts the build from ~6m40s
+to 56s, Record step from ~13m46s to 9m39s, total job from ~15m54s to
+12m09s. Shot execution came in ~1m10s above baseline (7m39s vs 6m20-33s),
+plausibly shared-runner variance; run 6 repeats the warm measurement to
+check.
 
 ## Variant B: (planned) single emulator boot + ATD image
 
