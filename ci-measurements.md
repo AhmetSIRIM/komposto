@@ -106,22 +106,22 @@ was cancelled mid-flight and is excluded.
 
 Per-run data:
 
-| #  | Run                                                                                | Gradle build | Shot record | Interaction | Record step | Total job |
-|----|------------------------------------------------------------------------------------|--------------|-------------|-------------|-------------|-----------|
-| 1  | [28994443316](https://github.com/AhmetSIRIM/komposto/actions/runs/28994443316)     | 0m53s        | 7m33s       | 0m21s       | 10m02s      | 11m32s    |
-| 2  | [28995055730](https://github.com/AhmetSIRIM/komposto/actions/runs/28995055730)     | 0m48s        | 8m05s       | 0m23s       | 10m19s      | 11m44s    |
-| 3  | [28997552785](https://github.com/AhmetSIRIM/komposto/actions/runs/28997552785)     | 1m04s        | 8m11s       | 0m22s       | 10m58s      | 13m03s    |
-| 4  | [28998332276](https://github.com/AhmetSIRIM/komposto/actions/runs/28998332276)     | 0m48s        | 7m44s       | 0m28s       | 10m05s      | 11m51s    |
-| 5  | [28998864854](https://github.com/AhmetSIRIM/komposto/actions/runs/28998864854)     | 0m54s        | 6m03s       | 0m19s       | 8m29s       | 10m35s    |
-| 6  | [28999360771](https://github.com/AhmetSIRIM/komposto/actions/runs/28999360771)     | 1m09s        | 7m14s       | 0m21s       | 9m47s       | 11m53s    |
-| 7  | [29000060156](https://github.com/AhmetSIRIM/komposto/actions/runs/29000060156)     | 0m48s        | 8m03s       | 0m22s       | 10m11s      | 11m50s    |
-| 8  | [29000710973](https://github.com/AhmetSIRIM/komposto/actions/runs/29000710973)     | 1m14s        | 6m51s       | 0m21s       | 9m30s       | 11m50s    |
-| 9  | [29001588527](https://github.com/AhmetSIRIM/komposto/actions/runs/29001588527)     | 1m06s        | 7m53s       | 0m27s       | 10m26s      | 12m03s    |
-| 10 | [29002272573](https://github.com/AhmetSIRIM/komposto/actions/runs/29002272573)     | 1m11s        | 7m04s       | 0m21s       | 9m48s       | 11m26s    |
-| -  | [29002914577](https://github.com/AhmetSIRIM/komposto/actions/runs/29002914577)     | cancelled mid-run, excluded | | | | |
-| 11 | [29003745963](https://github.com/AhmetSIRIM/komposto/actions/runs/29003745963)     | 0m56s        | 7m18s       | 0m21s       | 9m37s       | 11m08s    |
-| 12 | [29004689651](https://github.com/AhmetSIRIM/komposto/actions/runs/29004689651)     | 0m54s        | 7m39s       | 0m22s       | 9m57s       | 12m14s    |
-| 13 | [29005727827](https://github.com/AhmetSIRIM/komposto/actions/runs/29005727827)     | 1m09s        | 7m20s       | 0m23s       | 9m51s       | 11m36s    |
+| #  | Run                                                                            | Gradle build                | Shot record | Interaction | Record step | Total job |
+|----|--------------------------------------------------------------------------------|-----------------------------|-------------|-------------|-------------|-----------|
+| 1  | [28994443316](https://github.com/AhmetSIRIM/komposto/actions/runs/28994443316) | 0m53s                       | 7m33s       | 0m21s       | 10m02s      | 11m32s    |
+| 2  | [28995055730](https://github.com/AhmetSIRIM/komposto/actions/runs/28995055730) | 0m48s                       | 8m05s       | 0m23s       | 10m19s      | 11m44s    |
+| 3  | [28997552785](https://github.com/AhmetSIRIM/komposto/actions/runs/28997552785) | 1m04s                       | 8m11s       | 0m22s       | 10m58s      | 13m03s    |
+| 4  | [28998332276](https://github.com/AhmetSIRIM/komposto/actions/runs/28998332276) | 0m48s                       | 7m44s       | 0m28s       | 10m05s      | 11m51s    |
+| 5  | [28998864854](https://github.com/AhmetSIRIM/komposto/actions/runs/28998864854) | 0m54s                       | 6m03s       | 0m19s       | 8m29s       | 10m35s    |
+| 6  | [28999360771](https://github.com/AhmetSIRIM/komposto/actions/runs/28999360771) | 1m09s                       | 7m14s       | 0m21s       | 9m47s       | 11m53s    |
+| 7  | [29000060156](https://github.com/AhmetSIRIM/komposto/actions/runs/29000060156) | 0m48s                       | 8m03s       | 0m22s       | 10m11s      | 11m50s    |
+| 8  | [29000710973](https://github.com/AhmetSIRIM/komposto/actions/runs/29000710973) | 1m14s                       | 6m51s       | 0m21s       | 9m30s       | 11m50s    |
+| 9  | [29001588527](https://github.com/AhmetSIRIM/komposto/actions/runs/29001588527) | 1m06s                       | 7m53s       | 0m27s       | 10m26s      | 12m03s    |
+| 10 | [29002272573](https://github.com/AhmetSIRIM/komposto/actions/runs/29002272573) | 1m11s                       | 7m04s       | 0m21s       | 9m48s       | 11m26s    |
+| -  | [29002914577](https://github.com/AhmetSIRIM/komposto/actions/runs/29002914577) | cancelled mid-run, excluded |             |             |             |           |
+| 11 | [29003745963](https://github.com/AhmetSIRIM/komposto/actions/runs/29003745963) | 0m56s                       | 7m18s       | 0m21s       | 9m37s       | 11m08s    |
+| 12 | [29004689651](https://github.com/AhmetSIRIM/komposto/actions/runs/29004689651) | 0m54s                       | 7m39s       | 0m22s       | 9m57s       | 12m14s    |
+| 13 | [29005727827](https://github.com/AhmetSIRIM/komposto/actions/runs/29005727827) | 1m09s                       | 7m20s       | 0m23s       | 9m51s       | 11m36s    |
 
 Aggregates:
 
