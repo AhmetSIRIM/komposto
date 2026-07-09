@@ -97,18 +97,38 @@ Variant B verdict: CONFIRMED, small. Interaction cost reliably drops from
 runs (shared-runner noise), which can mask the saving in single-run
 totals.
 
+## Confirmation loop (A+B variant, repeated runs)
+
+To make sure runs 5-9 were not lucky samples, a scripted loop re-triggered
+the full pipeline repeatedly on 2026-07-09 (empty commits, one run at a
+time, raw per-run data in `ci-loop-runs.csv`). 13 successful runs; one run
+was cancelled mid-flight and is excluded.
+
+| Phase | n | Median | Min | Max | p90 |
+|---|---|---|---|---|---|
+| Gradle build | 13 | 56s | 48s | 1m14s | 1m11s |
+| Shot record | 13 | 7m33s | 6m03s | 8m11s | 8m05s |
+| Interaction tests | 13 | 22s | 19s | 28s | 27s |
+| Record step (whole) | 13 | 9m57s | 8m29s | 10m58s | 10m26s |
+| Total job | 13 | 11m50s | 10m35s | 13m03s | 12m14s |
+
+The medians confirm the earlier small-sample numbers: warm build stays
+under ~1m, interaction stays ~22s, and the total job lands at ~11m50s
+median against the ~15m54s baseline.
+
 ## Final summary
 
 | Variant | Total job (median) | Record step | Gradle build |
 |---|---|---|---|
 | Baseline (AVD cached) | 15m54s | 13m46s | ~6m40s cold, every run |
 | A: writable Gradle cache | 12m07s | 9m33s | ~54s |
-| A+B: plus single emulator session | 12m20s | 10m36s (incl. interaction) | ~51s |
+| A+B: plus single emulator session (n=13) | 11m50s | 9m57s (incl. interaction) | ~56s |
 
-Net effect of the proposed changes: roughly 15m54s to ~12m10s, about
-3m45s (24 percent) per PR run, dominated by variant A. Remaining dominant
-cost is Shot test execution (~8min); structural follow-ups (sharding, JVM
-screenshot testing) are out of scope here.
+Net effect of the proposed changes: roughly 15m54s to ~11m50s median,
+about 4 minutes (~25 percent) per PR run, dominated by variant A.
+Remaining dominant cost is Shot test execution (~7m30s median);
+structural follow-ups (sharding, JVM screenshot testing) are out of
+scope here.
 
 ## Additional finding: flaky CountdownTimer goldens
 
