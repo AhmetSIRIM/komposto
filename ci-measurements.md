@@ -89,11 +89,13 @@ one android-emulator-runner session removes that overhead.
 |---|---|---|---|---|---|---|
 | 7 | [28959113270](https://github.com/AhmetSIRIM/komposto/actions/runs/28959113270) | 10m36s | 48s | 8m15s | 23s | 12m04s |
 | 8 | [28960006229](https://github.com/AhmetSIRIM/komposto/actions/runs/28960006229) | 10m36s | 54s | 8m06s | 24s | 12m36s |
+| 9 | [28993031771](https://github.com/AhmetSIRIM/komposto/actions/runs/28993031771) | 9m32s | 54s | 7m14s | 22s | 11m38s |
 
 Variant B verdict: CONFIRMED, small. Interaction cost reliably drops from
 ~65s (separate step, own emulator boot) to ~23s in the shared session, a
-~40s structural saving. Shot execution noise (7m37s-8m15s across warm
-runs) partially masks it in single-run totals.
+~40s structural saving. Shot execution varies 7m14s-8m15s across warm
+runs (shared-runner noise), which can mask the saving in single-run
+totals.
 
 ## Final summary
 
@@ -123,7 +125,3 @@ CountdownTimer screenshot tests.
 from snapshot is already just ~20-60s AND a different system image can
 change rendered pixels, which would force regenerating all 227 LFS golden
 screenshots. Weak gain, real migration cost; not pursued.
-
-## Variant B: (planned) single emulator boot + ATD image
-
-Pending variant A completion.
