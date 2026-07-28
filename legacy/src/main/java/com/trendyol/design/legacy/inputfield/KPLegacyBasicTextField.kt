@@ -75,7 +75,6 @@ public fun KPLegacyBasicTextField(
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
         @Composable { innerTextField -> innerTextField() },
 ) {
-    // Mirror Compose BasicTextField(String) selection bridging so cursor is not reset on recomposition.
     var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
     val textFieldValue = textFieldValueState.copy(text = value)
     SideEffect {
