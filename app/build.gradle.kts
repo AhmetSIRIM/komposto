@@ -14,6 +14,7 @@ dependencies {
 
     implementation(projects.core)
     implementation(projects.bottomsheet)
+    implementation(projects.legacy)
 
     implementation(libs.androidxCore)
     implementation(libs.androidxLifecycleRuntime)
