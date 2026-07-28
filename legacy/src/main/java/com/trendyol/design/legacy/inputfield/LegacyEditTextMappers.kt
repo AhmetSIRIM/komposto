@@ -34,7 +34,6 @@ internal fun AppCompatEditText.applyTextStyle(style: TextStyle, density: Density
             if (weight >= FontWeight.Bold.weight) Typeface.BOLD else Typeface.NORMAL,
         )
     }
-    // Remove default EditText padding so decorationBox layouts match Compose better
     setPadding(0, 0, 0, 0)
     background = null
     includeFontPadding = false
@@ -91,8 +90,7 @@ internal fun KeyboardOptions.toInputType(singleLine: Boolean): Int {
     if (singleLine && keyboardType == KeyboardType.Text) {
         type = type or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
     }
-    // TextView.isSingleLine may OR MULTI_LINE; assigning inputType afterwards would wipe it.
-    if (!singleLine && (type and InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_TEXT) {
+    if (singleLine.not() && (type and InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_TEXT) {
         type = type or InputType.TYPE_TEXT_FLAG_MULTI_LINE
     }
     when (capitalization) {
