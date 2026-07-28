@@ -67,10 +67,6 @@ internal fun LegacyBasicTextFieldImpl(
 
     RememberFocusInteractionDispose(editTextRef, interactionSource)
 
-    // AndroidView + EditText breaks Compose virtual clocks / hint LaunchedEffects under
-    // Robolectric unit tests (LocalInspectionMode). Keep preview/test path on Foundation BTF.
-    // onTextLayout is invoked only on this inspection path; AndroidView path does not synthesize
-    // a TextLayoutResult.
     if (LocalInspectionMode.current) {
         BasicTextField(
             value = value,
