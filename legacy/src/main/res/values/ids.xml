@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Stable id for AndroidView-backed EditText so tooling that calls
+         Resources.getResourceEntryName(view.id) does not crash on View.NO_ID. -->
+    <item name="kp_legacy_basic_text_field" type="id" />
+</resources>

@@ -47,6 +47,7 @@ androidxLifecycleRuntime = { module = "androidx.lifecycle:lifecycle-runtime-ktx"
 androidMaterial = { module = "com.google.android.material:material", version.ref = "androidMaterial" }
 
 androidxComposeBOM = { module = "androidx.compose:compose-bom", version.ref = "androidxComposeBOM" }
+androidxComposeFoundation = { module = "androidx.compose.foundation:foundation" }
 androidxComposeMaterial = { module = "androidx.compose.material:material" }
 androidxComposeUiGoogleFonts = { module = "androidx.compose.ui:ui-text-google-fonts" }
 androidxComposeUiGraphics = { module = "androidx.compose.ui:ui-graphics" }
