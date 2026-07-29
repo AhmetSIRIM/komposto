@@ -1,6 +1,6 @@
-@file:OptIn(ExperimentalLegacyApi::class)
+@file:OptIn(ExperimentalCompatApi::class)
 
-package com.trendyol.design.ui.component.inputfield
+package com.trendyol.design.ui.component.compat
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,8 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
-import com.trendyol.design.legacy.annotation.ExperimentalLegacyApi
-import com.trendyol.design.legacy.inputfield.KPLegacyBasicTextField
+import com.trendyol.design.compat.annotation.ExperimentalCompatApi
+import com.trendyol.design.compat.inputfield.KPCompatBasicTextField
 import com.trendyol.design.ui.component.common.Component
 import com.trendyol.design.ui.component.common.Group
 import com.trendyol.design.ui.theme.TrendyolTheme
@@ -51,17 +51,17 @@ private val DECIMAL_AMOUNT_REGEX = Regex("""\d{0,7}([.,]\d{0,2})?""")
 
 @Preview(showBackground = true)
 @ShowkaseComposable(
-    group = Group.INPUT_FIELD,
-    name = Component.INPUT_FIELD_LEGACY_BASIC,
+    group = Group.COMPAT,
+    name = Component.COMPAT_BASIC_TEXT_FIELD,
     styleName = "3.Search"
 )
 @Composable
-internal fun Input_Field_LegacyBasicTextField_3_Search() = TrendyolTheme {
+internal fun Compat_BasicTextField_3_Search() = TrendyolTheme {
     var query by remember { mutableStateOf("") }
     var submittedQuery by remember { mutableStateOf<String?>(null) }
 
     SampleScaffold(title = "Search") {
-        KPLegacyBasicTextField(
+        KPCompatBasicTextField(
             value = query,
             onValueChange = { query = it },
             modifier = Modifier
@@ -97,17 +97,17 @@ internal fun Input_Field_LegacyBasicTextField_3_Search() = TrendyolTheme {
 
 @Preview(showBackground = true)
 @ShowkaseComposable(
-    group = Group.INPUT_FIELD,
-    name = Component.INPUT_FIELD_LEGACY_BASIC,
+    group = Group.COMPAT,
+    name = Component.COMPAT_BASIC_TEXT_FIELD,
     styleName = "4.Price"
 )
 @Composable
-internal fun Input_Field_LegacyBasicTextField_4_Price() = TrendyolTheme {
+internal fun Compat_BasicTextField_4_Price() = TrendyolTheme {
     var price by remember { mutableStateOf("") }
     val isError = price.any { !it.isDigit() } || price.length > MAX_PRICE_LENGTH
 
     SampleScaffold(title = "Integer price") {
-        KPLegacyBasicTextField(
+        KPCompatBasicTextField(
             value = price,
             onValueChange = { price = it },
             modifier = Modifier
@@ -138,12 +138,12 @@ internal fun Input_Field_LegacyBasicTextField_4_Price() = TrendyolTheme {
 
 @Preview(showBackground = true)
 @ShowkaseComposable(
-    group = Group.INPUT_FIELD,
-    name = Component.INPUT_FIELD_LEGACY_BASIC,
+    group = Group.COMPAT,
+    name = Component.COMPAT_BASIC_TEXT_FIELD,
     styleName = "5.DecimalAmount"
 )
 @Composable
-internal fun Input_Field_LegacyBasicTextField_5_DecimalAmount() = TrendyolTheme {
+internal fun Compat_BasicTextField_5_DecimalAmount() = TrendyolTheme {
     var amount by remember { mutableStateOf(TextFieldValue("")) }
     val normalizedAmount = amount.text.replace(',', '.')
     val amountError = when {
@@ -154,7 +154,7 @@ internal fun Input_Field_LegacyBasicTextField_5_DecimalAmount() = TrendyolTheme 
     }
 
     SampleScaffold(title = "Decimal amount") {
-        KPLegacyBasicTextField(
+        KPCompatBasicTextField(
             value = amount,
             onValueChange = { amount = it },
             modifier = Modifier
@@ -181,12 +181,12 @@ internal fun Input_Field_LegacyBasicTextField_5_DecimalAmount() = TrendyolTheme 
 
 @Preview(showBackground = true)
 @ShowkaseComposable(
-    group = Group.INPUT_FIELD,
-    name = Component.INPUT_FIELD_LEGACY_BASIC,
+    group = Group.COMPAT,
+    name = Component.COMPAT_BASIC_TEXT_FIELD,
     styleName = "6.Weight"
 )
 @Composable
-internal fun Input_Field_LegacyBasicTextField_6_Weight() = TrendyolTheme {
+internal fun Compat_BasicTextField_6_Weight() = TrendyolTheme {
     var weight by remember { mutableStateOf("") }
     val parsedWeight = weight.takeIf { value -> value.all(Char::isDigit) }?.toIntOrNull()
     val isError = weight.isNotEmpty() && (
@@ -196,7 +196,7 @@ internal fun Input_Field_LegacyBasicTextField_6_Weight() = TrendyolTheme {
         )
 
     SampleScaffold(title = "Weight") {
-        KPLegacyBasicTextField(
+        KPCompatBasicTextField(
             value = weight,
             onValueChange = { weight = it },
             modifier = Modifier
@@ -223,17 +223,17 @@ internal fun Input_Field_LegacyBasicTextField_6_Weight() = TrendyolTheme {
 
 @Preview(showBackground = true)
 @ShowkaseComposable(
-    group = Group.INPUT_FIELD,
-    name = Component.INPUT_FIELD_LEGACY_BASIC,
+    group = Group.COMPAT,
+    name = Component.COMPAT_BASIC_TEXT_FIELD,
     styleName = "7.Phone"
 )
 @Composable
-internal fun Input_Field_LegacyBasicTextField_7_Phone() = TrendyolTheme {
+internal fun Compat_BasicTextField_7_Phone() = TrendyolTheme {
     var phone by remember { mutableStateOf(TextFieldValue("")) }
     val isError = phone.text.any { !it.isDigit() } || phone.text.length > MAX_PHONE_LENGTH
 
     SampleScaffold(title = "Phone") {
-        KPLegacyBasicTextField(
+        KPCompatBasicTextField(
             value = phone,
             onValueChange = { phone = it },
             modifier = Modifier
@@ -264,17 +264,17 @@ internal fun Input_Field_LegacyBasicTextField_7_Phone() = TrendyolTheme {
 
 @Preview(showBackground = true)
 @ShowkaseComposable(
-    group = Group.INPUT_FIELD,
-    name = Component.INPUT_FIELD_LEGACY_BASIC,
+    group = Group.COMPAT,
+    name = Component.COMPAT_BASIC_TEXT_FIELD,
     styleName = "8.MultilineReason"
 )
 @Composable
-internal fun Input_Field_LegacyBasicTextField_8_MultilineReason() = TrendyolTheme {
+internal fun Compat_BasicTextField_8_MultilineReason() = TrendyolTheme {
     var reason by remember { mutableStateOf("") }
     val isError = reason.length > MAX_REASON_LENGTH
 
     SampleScaffold(title = "Multiline reason") {
-        KPLegacyBasicTextField(
+        KPCompatBasicTextField(
             value = reason,
             onValueChange = { reason = it },
             modifier = Modifier

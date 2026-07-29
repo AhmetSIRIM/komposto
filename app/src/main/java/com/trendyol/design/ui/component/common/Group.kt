@@ -19,4 +19,5 @@ object Group {
     const val DIALOG = "Dialog"
     const val INFO_BOX = "InfoBox"
     const val ICON_BUTTON = "Icon Button"
+    const val COMPAT = "Compat"
 }
