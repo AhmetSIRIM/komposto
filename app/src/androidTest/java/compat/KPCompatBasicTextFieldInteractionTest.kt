@@ -1,6 +1,6 @@
-@file:OptIn(ExperimentalLegacyApi::class)
+@file:OptIn(ExperimentalCompatApi::class)
 
-package inputfield
+package compat
 
 import android.app.Activity
 import android.content.Context
@@ -34,8 +34,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.trendyol.design.legacy.annotation.ExperimentalLegacyApi
-import com.trendyol.design.legacy.inputfield.KPLegacyBasicTextField
+import com.trendyol.design.compat.annotation.ExperimentalCompatApi
+import com.trendyol.design.compat.inputfield.KPCompatBasicTextField
 import com.trendyol.design.ui.theme.TrendyolTheme
 import core.InteractionTest
 import org.junit.Assert.assertEquals
@@ -45,7 +45,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @InteractionTest
-class KPLegacyBasicTextFieldInteractionTest {
+class KPCompatBasicTextFieldInteractionTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -56,7 +56,7 @@ class KPLegacyBasicTextFieldInteractionTest {
         composeTestRule.setContent {
             TrendyolTheme {
                 var text by remember { mutableStateOf("") }
-                KPLegacyBasicTextField(
+                KPCompatBasicTextField(
                     value = text,
                     onValueChange = {
                         text = it
@@ -64,16 +64,16 @@ class KPLegacyBasicTextFieldInteractionTest {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .testTag("legacy_tf"),
+                        .testTag("compat_tf"),
                     singleLine = true,
                 )
             }
         }
 
-        composeTestRule.onNodeWithTag("legacy_tf").performTextInput("abc")
+        composeTestRule.onNodeWithTag("compat_tf").performTextInput("abc")
         composeTestRule.waitForIdle()
         assertEquals("abc", latest)
-        composeTestRule.onNodeWithTag("legacy_tf").assertTextEquals("abc")
+        composeTestRule.onNodeWithTag("compat_tf").assertTextEquals("abc")
     }
 
     @Test
@@ -84,22 +84,22 @@ class KPLegacyBasicTextFieldInteractionTest {
                 var value by remember {
                     mutableStateOf(TextFieldValue("hello", TextRange(0, 5)))
                 }
-                KPLegacyBasicTextField(
+                KPCompatBasicTextField(
                     value = value,
                     onValueChange = { value = it },
                     modifier = Modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester)
-                        .testTag("legacy_tf"),
+                        .testTag("compat_tf"),
                     singleLine = true,
                 )
             }
         }
         composeTestRule.runOnIdle { focusRequester.requestFocus() }
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithTag("legacy_tf").performTextReplacement("x")
+        composeTestRule.onNodeWithTag("compat_tf").performTextReplacement("x")
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithTag("legacy_tf").assertTextEquals("x")
+        composeTestRule.onNodeWithTag("compat_tf").assertTextEquals("x")
     }
 
     @Test
@@ -108,19 +108,19 @@ class KPLegacyBasicTextFieldInteractionTest {
         composeTestRule.setContent {
             TrendyolTheme {
                 var text by remember { mutableStateOf("query") }
-                KPLegacyBasicTextField(
+                KPCompatBasicTextField(
                     value = text,
                     onValueChange = { text = it },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .testTag("legacy_tf"),
+                        .testTag("compat_tf"),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(onSearch = { searchClicked = true }),
                 )
             }
         }
-        composeTestRule.onNodeWithTag("legacy_tf").performImeAction()
+        composeTestRule.onNodeWithTag("compat_tf").performImeAction()
         composeTestRule.waitForIdle()
         assertTrue(searchClicked)
     }
@@ -131,7 +131,7 @@ class KPLegacyBasicTextFieldInteractionTest {
         composeTestRule.setContent {
             activity = LocalView.current.context as Activity
             TrendyolTheme {
-                KPLegacyBasicTextField(
+                KPCompatBasicTextField(
                     value = "",
                     onValueChange = {},
                     modifier = Modifier.fillMaxWidth(),
@@ -143,7 +143,7 @@ class KPLegacyBasicTextFieldInteractionTest {
 
         composeTestRule.runOnIdle {
             val inputType = activity.findViewById<EditText>(
-                com.trendyol.design.legacy.R.id.kp_legacy_basic_text_field
+                com.trendyol.design.compat.R.id.kp_compat_basic_text_field
             ).inputType
             assertEquals(
                 InputType.TYPE_CLASS_NUMBER,
@@ -161,13 +161,13 @@ class KPLegacyBasicTextFieldInteractionTest {
         composeTestRule.setContent {
             activity = LocalView.current.context as Activity
             TrendyolTheme {
-                KPLegacyBasicTextField(
+                KPCompatBasicTextField(
                     value = "",
                     onValueChange = {},
                     modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged { isComposeFocused = it.hasFocus }
-                        .testTag("legacy_tf"),
+                        .testTag("compat_tf"),
                     singleLine = true,
                 )
             }
@@ -175,10 +175,10 @@ class KPLegacyBasicTextFieldInteractionTest {
 
         lateinit var competingEditText: EditText
         composeTestRule.runOnUiThread {
-            val legacyEditText = activity.findViewById<EditText>(
-                com.trendyol.design.legacy.R.id.kp_legacy_basic_text_field
+            val compatEditText = activity.findViewById<EditText>(
+                com.trendyol.design.compat.R.id.kp_compat_basic_text_field
             )
-            legacyEditText.requestFocus()
+            compatEditText.requestFocus()
         }
         composeTestRule.waitForIdle()
         assertTrue(isComposeFocused)
@@ -192,11 +192,11 @@ class KPLegacyBasicTextFieldInteractionTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.runOnIdle {
-            val legacyEditText = activity.findViewById<EditText>(
-                com.trendyol.design.legacy.R.id.kp_legacy_basic_text_field
+            val compatEditText = activity.findViewById<EditText>(
+                com.trendyol.design.compat.R.id.kp_compat_basic_text_field
             )
             assertFalse(isComposeFocused)
-            assertFalse(legacyEditText.hasFocus())
+            assertFalse(compatEditText.hasFocus())
         }
         composeTestRule.runOnUiThread {
             (competingEditText.parent as ViewGroup).removeView(competingEditText)
@@ -212,13 +212,13 @@ class KPLegacyBasicTextFieldInteractionTest {
             activity = LocalView.current.context as Activity
             TrendyolTheme {
                 Column {
-                    KPLegacyBasicTextField(
+                    KPCompatBasicTextField(
                         value = "",
                         onValueChange = {},
                         modifier = Modifier
                             .fillMaxWidth()
                             .focusRequester(focusRequester)
-                            .testTag("legacy_tf"),
+                            .testTag("compat_tf"),
                         singleLine = true,
                     )
                 }
@@ -229,37 +229,37 @@ class KPLegacyBasicTextFieldInteractionTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.runOnIdle {
-            val legacyEditText = activity.findViewById<EditText>(
-                com.trendyol.design.legacy.R.id.kp_legacy_basic_text_field
+            val compatEditText = activity.findViewById<EditText>(
+                com.trendyol.design.compat.R.id.kp_compat_basic_text_field
             )
-            assertTrue(legacyEditText.hasFocus())
+            assertTrue(compatEditText.hasFocus())
         }
     }
 
     @Test
     fun nonEmptyField_clickFocusesEditorAndShowsIme() {
         lateinit var activity: Activity
-        lateinit var legacyEditText: EditText
+        lateinit var compatEditText: EditText
 
         composeTestRule.setContent {
             activity = LocalView.current.context as Activity
             TrendyolTheme {
-                KPLegacyBasicTextField(
+                KPCompatBasicTextField(
                     value = "query",
                     onValueChange = {},
                     modifier = Modifier
                         .fillMaxWidth()
-                        .testTag("legacy_tf"),
+                        .testTag("compat_tf"),
                     singleLine = true,
                 )
             }
         }
 
         composeTestRule.runOnUiThread {
-            legacyEditText = activity.findViewById(
-                com.trendyol.design.legacy.R.id.kp_legacy_basic_text_field
+            compatEditText = activity.findViewById(
+                com.trendyol.design.compat.R.id.kp_compat_basic_text_field
             )
-            legacyEditText.clearFocus()
+            compatEditText.clearFocus()
             val inputMethodManager =
                 activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             inputMethodManager.hideSoftInputFromWindow(
@@ -270,11 +270,11 @@ class KPLegacyBasicTextFieldInteractionTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.runOnUiThread {
-            legacyEditText.performClick()
+            compatEditText.performClick()
         }
 
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
-            legacyEditText.hasFocus() && isImeVisible(activity)
+            compatEditText.hasFocus() && isImeVisible(activity)
         }
     }
 
