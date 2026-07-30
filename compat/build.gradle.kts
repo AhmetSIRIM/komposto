@@ -13,6 +13,7 @@ dependencies {
     implementation(libs.androidxCore)
     implementation(libs.androidxAppCompat)
     implementation(libs.androidxLifecycleRuntime)
+    implementation(libs.androidxLifecycleRuntimeCompose)
 
     implementation(platform(libs.androidxComposeBOM))
     implementation(libs.androidxComposeFoundation)

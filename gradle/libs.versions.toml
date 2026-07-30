@@ -44,6 +44,7 @@ androidxAppCompat = { module = "androidx.appcompat:appcompat", version.ref = "an
 androidxCore = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
 androidxFragmentCompose = { module = "androidx.fragment:fragment-compose", version.ref = "androidxFragment" }
 androidxLifecycleRuntime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
+androidxLifecycleRuntimeCompose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 androidMaterial = { module = "com.google.android.material:material", version.ref = "androidMaterial" }
 
 androidxComposeBOM = { module = "androidx.compose:compose-bom", version.ref = "androidxComposeBOM" }
