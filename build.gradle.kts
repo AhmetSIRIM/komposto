@@ -32,4 +32,5 @@ dependencies {
     dokka(projects.theme)
     dokka(projects.core)
     dokka(projects.bottomsheet)
+    dokka(projects.compat)
 }
