@@ -37,6 +37,9 @@ dependencies {
     
     // Optional: Bottom sheet components
     implementation("com.trendyol.design:bottomsheet:latest")
+
+    // Optional: Compat EditText-backed BasicTextField (crash workaround only — not a standard DS input)
+    implementation("com.trendyol.design:compat:latest")
 }
 ```
 
@@ -47,6 +50,7 @@ Komposto is organized into modular components:
 - **`core`**: Main UI components and design tokens
 - **`theme`**: Theme configuration and color system
 - **`bottomsheet`**: Bottom sheet components and layouts
+- **`compat`**: Opt-in platform EditText text field for Compose TextClassifier/selection crash workarounds
 - **`app`**: Demo application with Showkase integration
 
 ## 🎨 Getting Started
