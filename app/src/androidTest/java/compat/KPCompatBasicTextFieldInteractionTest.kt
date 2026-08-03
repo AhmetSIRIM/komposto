@@ -142,9 +142,7 @@ class KPCompatBasicTextFieldInteractionTest {
         }
 
         composeTestRule.runOnIdle {
-            val inputType = activity.findViewById<EditText>(
-                com.trendyol.design.compat.R.id.kp_compat_basic_text_field
-            ).inputType
+            val inputType = activity.findViewById<EditText>(com.trendyol.design.compat.R.id.kp_compat_basic_text_field).inputType
             assertEquals(
                 InputType.TYPE_CLASS_NUMBER,
                 inputType and InputType.TYPE_MASK_CLASS,
@@ -175,9 +173,7 @@ class KPCompatBasicTextFieldInteractionTest {
 
         lateinit var competingEditText: EditText
         composeTestRule.runOnUiThread {
-            val compatEditText = activity.findViewById<EditText>(
-                com.trendyol.design.compat.R.id.kp_compat_basic_text_field
-            )
+            val compatEditText = activity.findViewById<EditText>(com.trendyol.design.compat.R.id.kp_compat_basic_text_field)
             compatEditText.requestFocus()
         }
         composeTestRule.waitForIdle()
@@ -192,9 +188,7 @@ class KPCompatBasicTextFieldInteractionTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.runOnIdle {
-            val compatEditText = activity.findViewById<EditText>(
-                com.trendyol.design.compat.R.id.kp_compat_basic_text_field
-            )
+            val compatEditText = activity.findViewById<EditText>(com.trendyol.design.compat.R.id.kp_compat_basic_text_field)
             assertFalse(isComposeFocused)
             assertFalse(compatEditText.hasFocus())
         }
@@ -229,9 +223,7 @@ class KPCompatBasicTextFieldInteractionTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.runOnIdle {
-            val compatEditText = activity.findViewById<EditText>(
-                com.trendyol.design.compat.R.id.kp_compat_basic_text_field
-            )
+            val compatEditText = activity.findViewById<EditText>(com.trendyol.design.compat.R.id.kp_compat_basic_text_field)
             assertTrue(compatEditText.hasFocus())
         }
     }
@@ -256,9 +248,7 @@ class KPCompatBasicTextFieldInteractionTest {
         }
 
         composeTestRule.runOnUiThread {
-            compatEditText = activity.findViewById(
-                com.trendyol.design.compat.R.id.kp_compat_basic_text_field
-            )
+            compatEditText = activity.findViewById<EditText>(com.trendyol.design.compat.R.id.kp_compat_basic_text_field)
             compatEditText.clearFocus()
             val inputMethodManager =
                 activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

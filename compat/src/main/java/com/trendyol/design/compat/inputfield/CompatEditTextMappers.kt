@@ -5,6 +5,7 @@ import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.text.InputType
 import android.util.TypedValue
+import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import androidx.appcompat.widget.AppCompatEditText
@@ -113,9 +114,12 @@ internal fun KeyboardOptions.toInputType(singleLine: Boolean): Int {
     return type
 }
 
-/** Invokes [onAction] when the soft keyboard fires the matching editor action id. */
+/**
+ * Invokes [onAction] for the configured soft-keyboard IME action, and for hardware / emulator
+ * Enter (often delivered as [EditorInfo.IME_ACTION_UNSPECIFIED] + [KeyEvent.KEYCODE_ENTER]).
+ */
 internal fun EditText.bindImeAction(imeAction: ImeAction, onAction: () -> Unit) {
-    setOnEditorActionListener { _, actionId, _ ->
+    setOnEditorActionListener { _, actionId, event ->
         val expected = when (imeAction) {
             ImeAction.Search -> EditorInfo.IME_ACTION_SEARCH
             ImeAction.Done -> EditorInfo.IME_ACTION_DONE
@@ -125,7 +129,12 @@ internal fun EditText.bindImeAction(imeAction: ImeAction, onAction: () -> Unit) 
             ImeAction.Send -> EditorInfo.IME_ACTION_SEND
             else -> return@setOnEditorActionListener false
         }
-        if (actionId == expected) {
+        val isExpectedAction = actionId == expected
+        val isHardwareEnter = actionId == EditorInfo.IME_ACTION_UNSPECIFIED &&
+            event != null &&
+            event.action == KeyEvent.ACTION_DOWN &&
+            (event.keyCode == KeyEvent.KEYCODE_ENTER || event.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER)
+        if (isExpectedAction || isHardwareEnter) {
             onAction()
             true
         } else {

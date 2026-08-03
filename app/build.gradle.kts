@@ -33,7 +33,11 @@ dependencies {
     implementation(libs.showkase)
     ksp(libs.showkaseProcessor)
 
+    androidTestImplementation(platform(libs.androidxComposeBOM))
     androidTestImplementation(libs.androidxComposeUiTestJunit4)
+    androidTestImplementation(libs.androidxTestCore)
+    androidTestImplementation(libs.androidxTestMonitor)
+    androidTestImplementation(libs.androidxTestRunner)
     androidTestImplementation(libs.androidxTestRules)
     debugImplementation(libs.androidxComposeUiTestManifest)
 }
