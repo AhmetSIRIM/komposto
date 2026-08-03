@@ -24,7 +24,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.trendyol.design.compat.R
 
 /**
  * [KeyboardActionScope] passed into [KeyboardActions] lambdas.
@@ -61,6 +60,7 @@ internal fun CompatBasicTextFieldImpl(
     onTextLayout: (TextLayoutResult) -> Unit,
     interactionSource: MutableInteractionSource,
     cursorBrush: Brush,
+    viewId: Int,
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit,
 ) {
     val density = LocalDensity.current
@@ -129,7 +129,7 @@ internal fun CompatBasicTextFieldImpl(
             ),
             factory = { context ->
                 SelectionAwareEditText(context).apply {
-                    id = R.id.kp_compat_basic_text_field
+                    id = viewId
                     layoutParams = FrameLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT,
@@ -179,6 +179,9 @@ internal fun CompatBasicTextFieldImpl(
             },
             update = { editText ->
                 editTextRef.editText = editText
+                if (editText.id != viewId) {
+                    editText.id = viewId
+                }
                 editText.layoutParams = FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT,

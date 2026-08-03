@@ -1,5 +1,6 @@
 package com.trendyol.design.compat.inputfield
 
+import androidx.annotation.IdRes
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,6 +17,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import com.trendyol.design.compat.R
 import com.trendyol.design.compat.annotation.ExperimentalCompatApi
 import com.trendyol.theme.KPDesign
 
@@ -35,17 +37,22 @@ import com.trendyol.theme.KPDesign
  *
  * ## Migrating from BasicTextField
  * Most parameters match BasicTextField. Important differences:
- * - Apply [Modifier] focus helpers (`focusRequester`, `onFocusChanged`, `testTag`) on this composable.
+ * - Apply [modifier] focus helpers (`focusRequester`, `onFocusChanged`, `testTag`) on this composable.
  *   The embedded editor is a **focus group** — use [androidx.compose.ui.focus.FocusState.hasFocus],
  *   not `isFocused`.
  * - Width is caller-owned (no forced `fillMaxWidth()`).
  * - [keyboardActions]: only your lambdas run. Platform defaults (hide IME / focus next) are **not**
  *   forwarded via [androidx.compose.foundation.text.KeyboardActionScope.defaultKeyboardAction].
+ *   Soft-keyboard IME buttons and hardware / emulator Enter both invoke the matching callback.
  * - [visualTransformation] is bridged through Android `TransformationMethod`. Prefer
  *   `remember { PasswordVisualTransformation() }` so the same instance survives recomposition.
  * - [onTextLayout] runs only in preview / inspection (`LocalInspectionMode`); not on device
  *   AndroidView path.
  * - [cursorBrush]: only [SolidColor] is applied.
+ * - [viewId]: Android `EditText` resource id used by Maestro / UIAutomator `id:` and by tooling that
+ *   resolves `Resources.getResourceEntryName(view.id)`. Defaults to [R.id.kp_compat_basic_text_field].
+ *   Pass a caller-owned id (e.g. `R.id.editTextSearchView`) when the screen needs a unique id.
+ *   Do **not** use [android.view.View.NO_ID] — some app tooling crashes on `#0xffffffff`.
  *
  * For caret / selection state, use the [TextFieldValue] overload.
  */
@@ -66,6 +73,7 @@ public fun KPCompatBasicTextField(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     cursorBrush: Brush = SolidColor(KPDesign.colors.colorPrimary),
+    @IdRes viewId: Int = R.id.kp_compat_basic_text_field,
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
         @Composable { innerTextField -> innerTextField() },
 ) {
@@ -103,6 +111,7 @@ public fun KPCompatBasicTextField(
         onTextLayout = onTextLayout,
         interactionSource = interactionSource,
         cursorBrush = cursorBrush,
+        viewId = viewId,
         decorationBox = decorationBox,
     )
 }
@@ -135,6 +144,7 @@ public fun KPCompatBasicTextField(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     cursorBrush: Brush = SolidColor(KPDesign.colors.colorPrimary),
+    @IdRes viewId: Int = R.id.kp_compat_basic_text_field,
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
         @Composable { innerTextField -> innerTextField() },
 ) {
@@ -153,6 +163,7 @@ public fun KPCompatBasicTextField(
         onTextLayout = onTextLayout,
         interactionSource = interactionSource,
         cursorBrush = cursorBrush,
+        viewId = viewId,
         decorationBox = decorationBox,
     )
 }
