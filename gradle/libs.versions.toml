@@ -1,6 +1,9 @@
 [versions]
 dokkaPlugin = "2.0.0"
-testRules = '1.6.1'
+testCore = "1.7.0"
+testMonitor = "1.7.2"
+testRunner = "1.7.0"
+testRules = "1.7.0"
 shot = '6.1.0'
 coil = '2.7.0'
 showkaseVersion = "1.0.3"
@@ -69,4 +72,7 @@ dokkaDocumentationPlugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin",
 shot = { module = "com.karumi:shot", version.ref = "shot" }
 androidxComposeUiTestJunit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 androidxComposeUiTestManifest = { module = "androidx.compose.ui:ui-test-manifest" }
+androidxTestCore = { module = "androidx.test:core", version.ref = "testCore" }
+androidxTestMonitor = { module = "androidx.test:monitor", version.ref = "testMonitor" }
+androidxTestRunner = { module = "androidx.test:runner", version.ref = "testRunner" }
 androidxTestRules = { module = "androidx.test:rules", version.ref = "testRules" }
