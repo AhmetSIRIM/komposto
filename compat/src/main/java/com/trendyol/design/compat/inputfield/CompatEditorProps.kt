@@ -6,6 +6,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
@@ -27,8 +29,11 @@ internal class EditorPropsSnapshot {
     var imeOptions: Int = 0
     var boundImeAction: ImeAction? = null
     var textColorArgb: Int = 0
-    var fontSizeSp: Float = Float.NaN
+    var fontSizePx: Float = Float.NaN
     var fontWeight: Int = -1
+    var fontFamily: FontFamily? = null
+    var fontStyleValue: Int = -1
+    var fontSynthesis: FontSynthesis? = null
 
     @Suppress("LongParameterList")
     fun matches(
@@ -67,18 +72,26 @@ internal class EditorPropsSnapshot {
     }
 
     fun styleMatches(style: TextStyle, density: Density): Boolean {
-        if (!applied) return false
-        val sizeSp = with(density) { style.fontSize.toPx() / density.density }
+        if (applied.not()) return false
+        val sizePx = with(density) { style.fontSize.toPx() }
         val weight = style.fontWeight?.weight ?: FontWeight.Normal.weight
+        val fontStyleValue = style.fontStyle?.value ?: 0
+        val fontSynthesis = style.fontSynthesis ?: FontSynthesis.All
         return textColorArgb == style.color.toArgb() &&
-            fontSizeSp == sizeSp &&
-            fontWeight == weight
+            fontSizePx == sizePx &&
+            fontWeight == weight &&
+            fontFamily == style.fontFamily &&
+            this.fontStyleValue == fontStyleValue &&
+            this.fontSynthesis == fontSynthesis
     }
 
     fun captureStyle(style: TextStyle, density: Density) {
         textColorArgb = style.color.toArgb()
-        fontSizeSp = with(density) { style.fontSize.toPx() / density.density }
+        fontSizePx = with(density) { style.fontSize.toPx() }
         fontWeight = style.fontWeight?.weight ?: FontWeight.Normal.weight
+        fontFamily = style.fontFamily
+        fontStyleValue = style.fontStyle?.value ?: 0
+        fontSynthesis = style.fontSynthesis ?: FontSynthesis.All
     }
 }
 
@@ -180,15 +193,16 @@ private fun SelectionAwareEditText.applyInputTypeAndReadOnly(
     }
 }
 
-/** Applies [style] only when color / size / weight differ from [snapshot] (or [force]). */
+/** Applies [style] only when color / size / family / weight differ from [snapshot] (or [force]). */
 internal fun SelectionAwareEditText.applyTextStyleIfChanged(
     snapshot: EditorPropsSnapshot,
     style: TextStyle,
     density: Density,
+    fontFamilyResolver: FontFamily.Resolver,
     force: Boolean = false,
 ) {
     if (!force && snapshot.styleMatches(style, density)) return
-    applyTextStyle(style, density)
+    applyTextStyle(style, density, fontFamilyResolver)
     snapshot.captureStyle(style, density)
 }
 

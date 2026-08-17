@@ -21,21 +21,31 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.LifecycleOwner
 import com.trendyol.design.compat.view.safePost
 
 /**
  * Requests focus, then shows the IME on the next frame via [safePost] if still focused
- * and editable (`keyListener != null`).
+ * and editable (`keyListener != null`). Safe to call when already focused (reshows IME).
  */
 internal fun AppCompatEditText.requestFocusAndShowKeyboard(lifecycleOwner: LifecycleOwner) {
     if (isEnabled.not() || isFocusable.not()) return
+    val alreadyFocused = hasFocus()
     requestFocus()
+    if (alreadyFocused.not()) {
+        showSoftInputIfAble(lifecycleOwner)
+    }
+}
+
+internal fun AppCompatEditText.showSoftInputIfAble(lifecycleOwner: LifecycleOwner) {
     if (keyListener == null) return
     safePost(lifecycleOwner) {
         if (hasFocus().not()) return@safePost
+        ViewCompat.getWindowInsetsController(this)?.show(WindowInsetsCompat.Type.ime())
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        imm?.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+        imm?.showSoftInput(this, 0)
     }
 }
 

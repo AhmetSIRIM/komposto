@@ -1,9 +1,11 @@
 package com.trendyol.design.compat.inputfield
 
 import android.content.Context
+import android.graphics.Rect
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.Job
 
 /**
@@ -67,9 +69,20 @@ internal class SelectionAwareEditText(context: Context) : AppCompatEditText(cont
     var focusedInteraction: FocusInteraction.Focus? = null
     var focusEmitJob: Job? = null
     var appliedCursorArgb: Int? = null
+    var keyboardLifecycleOwner: LifecycleOwner? = null
 
     override fun onSelectionChanged(selStart: Int, selEnd: Int) {
         super.onSelectionChanged(selStart, selEnd)
         onSelectionChange?.invoke(selStart, selEnd)
+    }
+
+    override fun requestFocus(direction: Int, previouslyFocusedRect: Rect?): Boolean {
+        val alreadyFocused = hasFocus()
+        val result = super.requestFocus(direction, previouslyFocusedRect)
+        val owner = keyboardLifecycleOwner
+        if (alreadyFocused && hasFocus() && owner != null) {
+            showSoftInputIfAble(owner)
+        }
+        return result
     }
 }

@@ -14,27 +14,35 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Density
 
-/** Maps Compose [TextStyle] onto the EditText (color, size, weight; clears default padding/bg). */
-internal fun AppCompatEditText.applyTextStyle(style: TextStyle, density: Density) {
+/** Maps Compose [TextStyle] onto the EditText (color, size, family, weight; clears default padding/bg). */
+internal fun AppCompatEditText.applyTextStyle(
+    style: TextStyle,
+    density: Density,
+    fontFamilyResolver: FontFamily.Resolver,
+) {
     setTextColor(style.color.toArgb())
-    val sizeSp = with(density) { style.fontSize.toPx() / density.density }
-    if (!sizeSp.isNaN()) {
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, sizeSp)
+    val sizePx = with(density) { style.fontSize.toPx() }
+    if (sizePx.isNaN().not()) {
+        setTextSize(TypedValue.COMPLEX_UNIT_PX, sizePx)
     }
-    val weight = style.fontWeight?.weight ?: FontWeight.Normal.weight
-    typeface = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        Typeface.create(typeface, weight, false)
-    } else {
-        Typeface.create(
-            typeface,
-            if (weight >= FontWeight.Bold.weight) Typeface.BOLD else Typeface.NORMAL,
-        )
+    val weight = style.fontWeight ?: FontWeight.Normal
+    val resolvedTypeface = fontFamilyResolver.resolve(
+        fontFamily = style.fontFamily,
+        fontWeight = weight,
+        fontStyle = style.fontStyle ?: FontStyle.Normal,
+        fontSynthesis = style.fontSynthesis ?: FontSynthesis.All,
+    ).value as? Typeface
+    if (resolvedTypeface != null) {
+        typeface = resolvedTypeface
     }
     setPadding(0, 0, 0, 0)
     background = null
