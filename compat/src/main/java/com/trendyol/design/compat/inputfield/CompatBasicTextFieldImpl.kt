@@ -325,7 +325,11 @@ private fun SelectionAwareEditText.syncCompatUpdate(
     )
     applyCursorBrushIfSolid(cursorBrush)
     bindImeActionIfChanged(editorProps, keyboardOptions.imeAction, onImeAction)
+    val wasNonEmpty = text?.isNotEmpty() == true
     applyValueFromCompose(value, lastEmitted)
+    if (wasNonEmpty && value.text.isEmpty() && hasFocus()) {
+        requestFocusAndShowKeyboard(lifecycleOwner)
+    }
 }
 
 private fun SelectionAwareEditText.applyCursorBrushIfSolid(cursorBrush: Brush) {

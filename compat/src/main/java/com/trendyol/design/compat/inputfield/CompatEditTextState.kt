@@ -77,9 +77,10 @@ internal class SelectionAwareEditText(context: Context) : AppCompatEditText(cont
     }
 
     override fun requestFocus(direction: Int, previouslyFocusedRect: Rect?): Boolean {
+        val alreadyFocused = hasFocus()
         val result = super.requestFocus(direction, previouslyFocusedRect)
         val owner = keyboardLifecycleOwner
-        if (hasFocus() && owner != null) {
+        if (alreadyFocused && hasFocus() && owner != null) {
             showSoftInputIfAble(owner)
         }
         return result

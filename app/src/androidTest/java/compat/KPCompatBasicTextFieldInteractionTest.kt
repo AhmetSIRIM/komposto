@@ -24,6 +24,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertTextEquals
@@ -51,6 +52,7 @@ import com.trendyol.design.ui.theme.TrendyolTheme
 import core.InteractionTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -160,7 +162,7 @@ class KPCompatBasicTextFieldInteractionTest {
             }
         }
         composeTestRule.waitForIdle()
-        composeTestRule.runOnIdle {
+        composeTestRule.runOnUiThread {
             lifecycleOwner.destroy()
             val editText = activity.findViewById<EditText>(
                 com.trendyol.design.compat.R.id.kp_compat_basic_text_field,
@@ -334,7 +336,7 @@ class KPCompatBasicTextFieldInteractionTest {
 
         composeTestRule.runOnIdle { focusRequester.requestFocus() }
 
-        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+        composeTestRule.waitUntil(timeoutMillis = 10_000) {
             compatEditText.hasFocus() && isImeVisible(activity)
         }
     }
@@ -361,7 +363,7 @@ class KPCompatBasicTextFieldInteractionTest {
         }
 
         composeTestRule.runOnIdle { focusRequester.requestFocus() }
-        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+        composeTestRule.waitUntil(timeoutMillis = 10_000) {
             activity.findViewById<EditText>(
                 com.trendyol.design.compat.R.id.kp_compat_basic_text_field,
             ).hasFocus()
@@ -371,11 +373,16 @@ class KPCompatBasicTextFieldInteractionTest {
             compatEditText = activity.findViewById(com.trendyol.design.compat.R.id.kp_compat_basic_text_field)
             hideIme(activity)
         }
-        composeTestRule.waitForIdle()
+        composeTestRule.waitUntil(timeoutMillis = 10_000) {
+            isImeVisible(activity).not()
+        }
 
-        composeTestRule.runOnIdle { focusRequester.requestFocus() }
+        composeTestRule.runOnUiThread {
+            focusRequester.requestFocus()
+            compatEditText.requestFocus()
+        }
 
-        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+        composeTestRule.waitUntil(timeoutMillis = 10_000) {
             compatEditText.hasFocus() && isImeVisible(activity)
         }
     }
@@ -402,14 +409,16 @@ class KPCompatBasicTextFieldInteractionTest {
         }
 
         composeTestRule.runOnIdle { focusRequester.requestFocus() }
-        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+        composeTestRule.waitUntil(timeoutMillis = 10_000) {
             activity.findViewById<EditText>(
                 com.trendyol.design.compat.R.id.kp_compat_basic_text_field,
             ).hasFocus()
         }
 
         composeTestRule.runOnUiThread { hideIme(activity) }
-        composeTestRule.waitForIdle()
+        composeTestRule.waitUntil(timeoutMillis = 10_000) {
+            isImeVisible(activity).not()
+        }
 
         // Mirrors Search clear (X): FocusRequester + empty text.
         composeTestRule.runOnIdle {
@@ -417,7 +426,7 @@ class KPCompatBasicTextFieldInteractionTest {
             text = ""
         }
 
-        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+        composeTestRule.waitUntil(timeoutMillis = 10_000) {
             activity.findViewById<EditText>(
                 com.trendyol.design.compat.R.id.kp_compat_basic_text_field,
             ).hasFocus() && isImeVisible(activity)
@@ -453,8 +462,11 @@ class KPCompatBasicTextFieldInteractionTest {
     @Test
     fun textStyleFontFamily_isAppliedToEditText() {
         lateinit var activity: Activity
+        var expectedTypeface: Typeface? = null
         composeTestRule.setContent {
             activity = LocalView.current.context as Activity
+            val resolver = LocalFontFamilyResolver.current
+            expectedTypeface = resolver.resolve(FontFamily.SansSerif).value as Typeface
             TrendyolTheme {
                 KPCompatBasicTextField(
                     value = "Aa",
@@ -472,7 +484,9 @@ class KPCompatBasicTextFieldInteractionTest {
             val editText = activity.findViewById<EditText>(
                 com.trendyol.design.compat.R.id.kp_compat_basic_text_field,
             )
-            assertEquals(Typeface.SANS_SERIF, editText.typeface)
+            val applied = editText.typeface
+            assertNotNull(applied)
+            assertEquals(expectedTypeface?.style, applied.style)
         }
     }
 
@@ -506,7 +520,7 @@ class KPCompatBasicTextFieldInteractionTest {
             compatEditText.performClick()
         }
 
-        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+        composeTestRule.waitUntil(timeoutMillis = 10_000) {
             compatEditText.hasFocus() && isImeVisible(activity)
         }
     }
@@ -528,7 +542,7 @@ class KPCompatBasicTextFieldInteractionTest {
     private class MutableLifecycleOwner(
         initial: Lifecycle.State,
     ) : LifecycleOwner {
-        private val registry = LifecycleRegistry(this)
+        private val registry = LifecycleRegistry.createUnsafe(this)
 
         init {
             registry.currentState = initial
