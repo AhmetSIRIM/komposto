@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -23,6 +24,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 
 /**
@@ -64,6 +66,7 @@ internal fun CompatBasicTextFieldImpl(
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit,
 ) {
     val density = LocalDensity.current
+    val fontFamilyResolver = LocalFontFamilyResolver.current
     val scope = rememberCoroutineScope()
     val onValueChangeState = rememberUpdatedState(onValueChange)
     val valueState = rememberUpdatedState(value)
@@ -99,6 +102,17 @@ internal fun CompatBasicTextFieldImpl(
     }
 
     fun invokeKeyboardAction(imeAction: ImeAction) {
+        val editText = editTextRef.editText
+
+        if (
+            lifecycleOwnerState.value.lifecycle.currentState
+                .isAtLeast(Lifecycle.State.CREATED).not() ||
+            editText == null ||
+            editText.isAttachedToWindow.not()
+        ) {
+            return
+        }
+
         val actions = keyboardActionsState.value
         val actionScope = NoOpKeyboardActionScope
         when (imeAction) {
@@ -114,19 +128,21 @@ internal fun CompatBasicTextFieldImpl(
 
     decorationBox {
         AndroidView(
-            modifier = modifier.compatEditTextSemantics(
-                valueState = valueState,
-                editTextRef = editTextRef,
-                enabled = enabled,
-                readOnly = readOnly,
-                imeAction = keyboardOptions.imeAction,
-                lastEmitted = lastEmitted,
-                onValueChangeState = onValueChangeState,
-                onImeAction = { invokeKeyboardAction(keyboardOptionsState.value.imeAction) },
-                visualTransformation = visualTransformation,
-                keyboardOptions = keyboardOptions,
-                lifecycleOwner = lifecycleOwnerState.value,
-            ),
+            modifier = modifier
+                .compatShowImeOnComposeFocus(editTextRef) { lifecycleOwnerState.value }
+                .compatEditTextSemantics(
+                    valueState = valueState,
+                    editTextRef = editTextRef,
+                    enabled = enabled,
+                    readOnly = readOnly,
+                    imeAction = keyboardOptions.imeAction,
+                    lastEmitted = lastEmitted,
+                    onValueChangeState = onValueChangeState,
+                    onImeAction = { invokeKeyboardAction(keyboardOptionsState.value.imeAction) },
+                    visualTransformation = visualTransformation,
+                    keyboardOptions = keyboardOptions,
+                    lifecycleOwner = lifecycleOwnerState.value,
+                ),
             factory = { context ->
                 SelectionAwareEditText(context).apply {
                     id = viewId
@@ -134,8 +150,15 @@ internal fun CompatBasicTextFieldImpl(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT,
                     )
+                    keyboardLifecycleOwner = lifecycleOwnerState.value
 
-                    applyTextStyleIfChanged(editorProps, textStyle, density, force = true)
+                    applyTextStyleIfChanged(
+                        snapshot = editorProps,
+                        style = textStyle,
+                        density = density,
+                        fontFamilyResolver = fontFamilyResolver,
+                        force = true,
+                    )
                     applyEditorProps(
                         snapshot = editorProps,
                         enabled = enabled,
@@ -179,6 +202,7 @@ internal fun CompatBasicTextFieldImpl(
             },
             update = { editText ->
                 editTextRef.editText = editText
+                editText.keyboardLifecycleOwner = lifecycleOwnerState.value
                 if (editText.id != viewId) {
                     editText.id = viewId
                 }
@@ -196,7 +220,12 @@ internal fun CompatBasicTextFieldImpl(
                 )
 
                 editText.applyVisualTransformation(visualTransformation, readOnly = readOnly)
-                editText.applyTextStyleIfChanged(editorProps, textStyle, density)
+                editText.applyTextStyleIfChanged(
+                    snapshot = editorProps,
+                    style = textStyle,
+                    density = density,
+                    fontFamilyResolver = fontFamilyResolver,
+                )
                 if (cursorBrush is SolidColor) {
                     editText.applyCursorColorIfChanged(cursorBrush.toColor())
                 }
@@ -204,6 +233,13 @@ internal fun CompatBasicTextFieldImpl(
                     invokeKeyboardAction(keyboardOptionsState.value.imeAction)
                 }
                 editText.applyValueFromCompose(valueState.value, lastEmitted)
+            },
+            onRelease = { editText ->
+                editText.setOnEditorActionListener(null)
+                editText.keyboardLifecycleOwner = null
+                if (editTextRef.editText === editText) {
+                    editTextRef.editText = null
+                }
             },
         )
     }

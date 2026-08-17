@@ -44,6 +44,14 @@ import com.trendyol.theme.KPDesign
  * - [keyboardActions]: only your lambdas run. Platform defaults (hide IME / focus next) are **not**
  *   forwarded via [androidx.compose.foundation.text.KeyboardActionScope.defaultKeyboardAction].
  *   Soft-keyboard IME buttons and hardware / emulator Enter both invoke the matching callback.
+ *   Callbacks are skipped when the host [androidx.lifecycle.Lifecycle] is below `CREATED`
+ *   (Fragment `onDestroyView` / disposed composition), or when the platform EditText is detached
+ *   from the window. The editor-action listener is cleared in `AndroidView.onRelease`.
+ * - [modifier] `focusRequester` / programmatic `requestFocus()` focuses the platform EditText and
+ *   shows the IME (same as Foundation BasicTextField). Already-focused `requestFocus()` (e.g.
+ *   sibling "X" / clear that calls FocusRequester again) also reshows the IME.
+ * - [textStyle.fontSize] is applied as Compose `toPx()` (`COMPLEX_UNIT_PX`) so device font scale
+ *   matches BasicTextField. [textStyle.fontFamily] is resolved via `LocalFontFamilyResolver`.
  * - [visualTransformation] is bridged through Android `TransformationMethod`. Prefer
  *   `remember { PasswordVisualTransformation() }` so the same instance survives recomposition.
  * - [onTextLayout] runs only in preview / inspection (`LocalInspectionMode`); not on device
