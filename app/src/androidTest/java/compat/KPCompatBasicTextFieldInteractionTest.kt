@@ -4,14 +4,17 @@ package compat
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Typeface
 import android.text.InputType
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertTextEquals
@@ -29,11 +33,18 @@ import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.sp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.trendyol.design.compat.annotation.ExperimentalCompatApi
 import com.trendyol.design.compat.inputfield.KPCompatBasicTextField
 import com.trendyol.design.ui.theme.TrendyolTheme
@@ -123,6 +134,71 @@ class KPCompatBasicTextFieldInteractionTest {
         composeTestRule.onNodeWithTag("compat_tf").performImeAction()
         composeTestRule.waitForIdle()
         assertTrue(searchClicked)
+    }
+
+    @Test
+    fun imeSearch_whenLifecycleDestroyed_doesNotInvokeKeyboardAction() {
+        val lifecycleOwner = MutableLifecycleOwner(Lifecycle.State.RESUMED)
+        var searchClicked = false
+        lateinit var activity: Activity
+        composeTestRule.setContent {
+            activity = LocalView.current.context as Activity
+            CompositionLocalProvider(LocalLifecycleOwner provides lifecycleOwner) {
+                TrendyolTheme {
+                    var text by remember { mutableStateOf("query") }
+                    KPCompatBasicTextField(
+                        value = text,
+                        onValueChange = { text = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("compat_tf"),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                        keyboardActions = KeyboardActions(onSearch = { searchClicked = true }),
+                    )
+                }
+            }
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnIdle {
+            lifecycleOwner.destroy()
+            val editText = activity.findViewById<EditText>(
+                com.trendyol.design.compat.R.id.kp_compat_basic_text_field,
+            )
+            editText.onEditorAction(EditorInfo.IME_ACTION_SEARCH)
+        }
+        assertFalse(searchClicked)
+    }
+
+    @Test
+    fun imeSearch_whenEditTextDetached_doesNotInvokeKeyboardAction() {
+        var searchClicked = false
+        lateinit var activity: Activity
+        composeTestRule.setContent {
+            activity = LocalView.current.context as Activity
+            TrendyolTheme {
+                var text by remember { mutableStateOf("query") }
+                KPCompatBasicTextField(
+                    value = text,
+                    onValueChange = { text = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("compat_tf"),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(onSearch = { searchClicked = true }),
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnIdle {
+            val editText = activity.findViewById<EditText>(
+                com.trendyol.design.compat.R.id.kp_compat_basic_text_field,
+            )
+            (editText.parent as ViewGroup).removeView(editText)
+            editText.onEditorAction(EditorInfo.IME_ACTION_SEARCH)
+        }
+        assertFalse(searchClicked)
     }
 
     @Test
@@ -229,6 +305,178 @@ class KPCompatBasicTextFieldInteractionTest {
     }
 
     @Test
+    fun focusRequester_showsIme() {
+        val focusRequester = FocusRequester()
+        lateinit var activity: Activity
+        lateinit var compatEditText: EditText
+
+        composeTestRule.setContent {
+            activity = LocalView.current.context as Activity
+            TrendyolTheme {
+                KPCompatBasicTextField(
+                    value = "query",
+                    onValueChange = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
+                        .testTag("compat_tf"),
+                    singleLine = true,
+                )
+            }
+        }
+
+        composeTestRule.runOnUiThread {
+            compatEditText = activity.findViewById(com.trendyol.design.compat.R.id.kp_compat_basic_text_field)
+            compatEditText.clearFocus()
+            hideIme(activity)
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.runOnIdle { focusRequester.requestFocus() }
+
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            compatEditText.hasFocus() && isImeVisible(activity)
+        }
+    }
+
+    @Test
+    fun focusRequester_whenAlreadyFocusedAfterImeHidden_reshowsIme() {
+        val focusRequester = FocusRequester()
+        lateinit var activity: Activity
+        lateinit var compatEditText: EditText
+
+        composeTestRule.setContent {
+            activity = LocalView.current.context as Activity
+            TrendyolTheme {
+                KPCompatBasicTextField(
+                    value = "query",
+                    onValueChange = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
+                        .testTag("compat_tf"),
+                    singleLine = true,
+                )
+            }
+        }
+
+        composeTestRule.runOnIdle { focusRequester.requestFocus() }
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            activity.findViewById<EditText>(
+                com.trendyol.design.compat.R.id.kp_compat_basic_text_field,
+            ).hasFocus()
+        }
+
+        composeTestRule.runOnUiThread {
+            compatEditText = activity.findViewById(com.trendyol.design.compat.R.id.kp_compat_basic_text_field)
+            hideIme(activity)
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.runOnIdle { focusRequester.requestFocus() }
+
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            compatEditText.hasFocus() && isImeVisible(activity)
+        }
+    }
+
+    @Test
+    fun clearTextAndFocusRequester_reshowsIme() {
+        val focusRequester = FocusRequester()
+        lateinit var activity: Activity
+        var text by mutableStateOf("query")
+
+        composeTestRule.setContent {
+            activity = LocalView.current.context as Activity
+            TrendyolTheme {
+                KPCompatBasicTextField(
+                    value = text,
+                    onValueChange = { text = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
+                        .testTag("compat_tf"),
+                    singleLine = true,
+                )
+            }
+        }
+
+        composeTestRule.runOnIdle { focusRequester.requestFocus() }
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            activity.findViewById<EditText>(
+                com.trendyol.design.compat.R.id.kp_compat_basic_text_field,
+            ).hasFocus()
+        }
+
+        composeTestRule.runOnUiThread { hideIme(activity) }
+        composeTestRule.waitForIdle()
+
+        // Mirrors Search clear (X): FocusRequester + empty text.
+        composeTestRule.runOnIdle {
+            focusRequester.requestFocus()
+            text = ""
+        }
+
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            activity.findViewById<EditText>(
+                com.trendyol.design.compat.R.id.kp_compat_basic_text_field,
+            ).hasFocus() && isImeVisible(activity)
+        }
+    }
+
+    @Test
+    fun textStyleFontSize_matchesComposePx() {
+        lateinit var activity: Activity
+        var expectedPx = 0f
+        composeTestRule.setContent {
+            activity = LocalView.current.context as Activity
+            val density = LocalDensity.current
+            expectedPx = with(density) { 16.sp.toPx() }
+            TrendyolTheme {
+                KPCompatBasicTextField(
+                    value = "Aa",
+                    onValueChange = {},
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    textStyle = TextStyle(fontSize = 16.sp),
+                )
+            }
+        }
+        composeTestRule.runOnIdle {
+            val editText = activity.findViewById<EditText>(
+                com.trendyol.design.compat.R.id.kp_compat_basic_text_field,
+            )
+            assertEquals(expectedPx, editText.textSize, 0.5f)
+        }
+    }
+
+    @Test
+    fun textStyleFontFamily_isAppliedToEditText() {
+        lateinit var activity: Activity
+        composeTestRule.setContent {
+            activity = LocalView.current.context as Activity
+            TrendyolTheme {
+                KPCompatBasicTextField(
+                    value = "Aa",
+                    onValueChange = {},
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    textStyle = TextStyle(
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily.SansSerif,
+                    ),
+                )
+            }
+        }
+        composeTestRule.runOnIdle {
+            val editText = activity.findViewById<EditText>(
+                com.trendyol.design.compat.R.id.kp_compat_basic_text_field,
+            )
+            assertEquals(Typeface.SANS_SERIF, editText.typeface)
+        }
+    }
+
+    @Test
     fun nonEmptyField_clickFocusesEditorAndShowsIme() {
         lateinit var activity: Activity
         lateinit var compatEditText: EditText
@@ -250,12 +498,7 @@ class KPCompatBasicTextFieldInteractionTest {
         composeTestRule.runOnUiThread {
             compatEditText = activity.findViewById<EditText>(com.trendyol.design.compat.R.id.kp_compat_basic_text_field)
             compatEditText.clearFocus()
-            val inputMethodManager =
-                activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputMethodManager.hideSoftInputFromWindow(
-                activity.window.decorView.windowToken,
-                0,
-            )
+            hideIme(activity)
         }
         composeTestRule.waitForIdle()
 
@@ -268,8 +511,36 @@ class KPCompatBasicTextFieldInteractionTest {
         }
     }
 
+    private fun hideIme(activity: Activity) {
+        val inputMethodManager =
+            activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(
+            activity.window.decorView.windowToken,
+            0,
+        )
+    }
+
     private fun isImeVisible(activity: Activity): Boolean {
         return ViewCompat.getRootWindowInsets(activity.window.decorView)
             ?.isVisible(WindowInsetsCompat.Type.ime()) == true
+    }
+
+    private class MutableLifecycleOwner(
+        initial: Lifecycle.State,
+    ) : LifecycleOwner {
+        private val registry = LifecycleRegistry(this)
+
+        init {
+            registry.currentState = initial
+        }
+
+        fun destroy() {
+            registry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+            registry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+            registry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        }
+
+        override val lifecycle: Lifecycle
+            get() = registry
     }
 }
