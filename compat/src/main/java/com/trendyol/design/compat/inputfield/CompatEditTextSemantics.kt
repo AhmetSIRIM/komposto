@@ -26,11 +26,17 @@ import com.trendyol.design.compat.view.safePost
 
 /**
  * Requests focus, then shows the IME on the next frame via [safePost] if still focused
- * and editable (`keyListener != null`).
+ * and editable (`keyListener != null`). Safe to call when already focused (reshows IME).
  */
 internal fun AppCompatEditText.requestFocusAndShowKeyboard(lifecycleOwner: LifecycleOwner) {
     if (isEnabled.not() || isFocusable.not()) return
     requestFocus()
+    if (hasFocus().not()) {
+        showSoftInputIfAble(lifecycleOwner)
+    }
+}
+
+internal fun AppCompatEditText.showSoftInputIfAble(lifecycleOwner: LifecycleOwner) {
     if (keyListener == null) return
     safePost(lifecycleOwner) {
         if (hasFocus().not()) return@safePost

@@ -6,8 +6,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+
+/**
+ * When Compose reports [androidx.compose.ui.focus.FocusState.hasFocus], forward to the platform
+ * [android.widget.EditText] and show the IME (FocusRequester / sibling "clear" buttons).
+ */
+internal fun Modifier.compatShowImeOnComposeFocus(
+    editTextRef: EditTextRef,
+    lifecycleOwner: () -> LifecycleOwner,
+): Modifier = onFocusChanged { state ->
+    if (state.hasFocus) {
+        editTextRef.editText?.requestFocusAndShowKeyboard(lifecycleOwner())
+    }
+}
 
 /**
  * Mirrors EditText focus onto [MutableInteractionSource] as
